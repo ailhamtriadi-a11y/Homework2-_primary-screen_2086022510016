@@ -6,7 +6,7 @@ import '../widgets/news_banner_widget.dart';
 import '../data/mock_product.dart';
 
 class PrimaryScreen extends StatefulWidget {
-  const PrimaryScreen({Key? key}) : super(key: key);
+  const PrimaryScreen({super.key});
 
   @override
   State<PrimaryScreen> createState() => _PrimaryScreenState();
@@ -139,6 +139,7 @@ class _PrimaryScreenState extends State<PrimaryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SearchBarWidget(
+              searchQuery: _searchQuery,
               onSearchChanged: (query) {
                 setState(() => _searchQuery = query);
               },
@@ -188,6 +189,8 @@ class _PrimaryScreenState extends State<PrimaryScreen> {
             ],
 
             NewsBannerWidget(
+              title: 'Art Updates',
+              subtitle: 'Berita & status terbaru karya favoritmu',
               updates: _newsUpdates,
               activeFilter: _activeFilter,
             ),

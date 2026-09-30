@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 class SearchBarWidget extends StatelessWidget {
+  final String searchQuery;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onStarPressed;
   final bool isFilterVisible;
 
-  const SearchBarWidget({
-    Key? key,
-    required this.onSearchChanged,
-    required this.onStarPressed,
-    required this.isFilterVisible,
-  }) : super(key: key);
+const SearchBarWidget({
+  super.key,
+  required this.searchQuery,
+  required this.onSearchChanged,
+  required this.onStarPressed,
+  required this.isFilterVisible,
+});
 
   @override
   Widget build(BuildContext context) {

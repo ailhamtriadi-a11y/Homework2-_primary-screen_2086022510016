@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
 class NewsBannerWidget extends StatelessWidget {
+  final String title;
+  final String subtitle;
   final List<String> updates;
   final String activeFilter;
 
   const NewsBannerWidget({
-    Key? key,
+    super.key,
+    required this.title,
+    required this.subtitle,
     required this.updates,
     required this.activeFilter,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

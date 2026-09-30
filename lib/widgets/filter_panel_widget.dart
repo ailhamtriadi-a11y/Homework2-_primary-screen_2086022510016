@@ -8,15 +8,15 @@ class FilterPanelWidget extends StatelessWidget {
   final VoidCallback onApplyFilter;
   final VoidCallback onClearFilter;
 
-  const FilterPanelWidget({
-    Key? key,
-    required this.selectedCategory,
-    required this.selectedSubFilter,
-    required this.onCategorySelected,
-    required this.onSubFilterSelected,
-    required this.onApplyFilter,
-    required this.onClearFilter,
-  }) : super(key: key);
+const FilterPanelWidget({
+  super.key,
+  required this.selectedCategory,
+  required this.selectedSubFilter,
+  required this.onCategorySelected,
+  required this.onSubFilterSelected,
+  required this.onApplyFilter,
+  required this.onClearFilter,
+});
 
   @override
   Widget build(BuildContext context) {

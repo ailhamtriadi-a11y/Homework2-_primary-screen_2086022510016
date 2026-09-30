@@ -14,21 +14,21 @@ class ProductCardWidget extends StatelessWidget {
   final VoidCallback onSave;
   final VoidCallback onCancel;
 
-  const ProductCardWidget({
-    Key? key,
-    required this.title,
-    required this.artist,
-    required this.price,
-    required this.rating,
-    this.location,
-    required this.imagePlaceholder,
-    required this.buyCount,
-    required this.isSaved,
-    required this.onTap,
-    required this.onBuy,
-    required this.onSave,
-    required this.onCancel,
-  }) : super(key: key);
+const ProductCardWidget({
+  super.key,
+  required this.title,
+  required this.artist,
+  required this.price,
+  required this.rating,
+  this.location,
+  required this.imagePlaceholder,
+  required this.buyCount,
+  required this.isSaved,
+  required this.onTap,
+  required this.onBuy,
+  required this.onSave,
+  required this.onCancel,
+});
 
   @override
   Widget build(BuildContext context) {
