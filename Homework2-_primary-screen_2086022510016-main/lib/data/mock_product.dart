@@ -24,7 +24,7 @@ final List<Map<String, dynamic>> mockProducts = [
     'reviews': 25,
     'location': 'Bandung',
     'payment': 'Tunai',
-    'promo': 'Tanpa Promo',
+    'promo': 'Tidak Promo',
     'ratingTag': 'Rating 5.0',
     'imagePlaceholder': 'Lukisan Batik',
     'altImages': ['Frame', 'Tekstur'],
@@ -58,7 +58,7 @@ final List<Map<String, dynamic>> mockProducts = [
     'reviews': 9,
     'location': 'Yogyakarta',
     'payment': 'Transfer M-Banking',
-    'promo': 'Tanpa Promo',
+    'promo': 'Tidak Promo',
     'ratingTag': 'Rating 4.0+',
     'imagePlaceholder': 'Kaligrafi Modern',
     'altImages': ['Detail Tulisan', 'Frame Black'],
@@ -109,7 +109,7 @@ final List<Map<String, dynamic>> mockProducts = [
     'reviews': 8,
     'location': 'Kasongan',
     'payment': 'Tunai',
-    'promo': 'Tanpa Promo',
+    'promo': 'Tidak Promo',
     'ratingTag': 'Rating 4.0+',
     'imagePlaceholder': 'Vase Tanah Liat',
     'altImages': ['Atas', 'Samping'],
@@ -143,7 +143,7 @@ final List<Map<String, dynamic>> mockProducts = [
     'reviews': 6,
     'location': 'Surabaya',
     'payment': 'Transfer M-Banking',
-    'promo': 'Tanpa Promo',
+    'promo': 'Tidak Promo',
     'ratingTag': 'Rating 4.0+',
     'imagePlaceholder': 'Hiasan Resin',
     'altImages': ['Kilau Resin', 'Sisi Miring'],
@@ -177,7 +177,7 @@ final List<Map<String, dynamic>> mockProducts = [
     'reviews': 15,
     'location': 'Solo',
     'payment': 'Transfer M-Banking',
-    'promo': 'Tanpa Promo',
+    'promo': 'Tidak Promo',
     'ratingTag': 'Rating 4.0+',
     'imagePlaceholder': 'Patung Perunggu',
     'altImages': ['Samping Kiri', 'Base Dudukan'],
@@ -211,7 +211,7 @@ final List<Map<String, dynamic>> mockProducts = [
     'reviews': 22,
     'location': 'Jakarta',
     'payment': 'Transfer M-Banking',
-    'promo': 'Tanpa Promo',
+    'promo': 'Tidak Promo',
     'ratingTag': 'Rating 4.0+',
     'imagePlaceholder': 'Sketsa Pensil',
     'altImages': ['Detail Mata', 'Frame Bingkai'],
@@ -262,7 +262,7 @@ final List<Map<String, dynamic>> mockProducts = [
     'reviews': 33,
     'location': 'Bandung',
     'payment': 'Transfer M-Banking',
-    'promo': 'Tanpa Promo',
+    'promo': 'Tidak Promo',
     'ratingTag': 'Rating 4.0+',
     'imagePlaceholder': 'Gantungan Kulit',
     'altImages': ['Jahitan Tangan', 'Ring Besi'],
@@ -296,7 +296,7 @@ final List<Map<String, dynamic>> mockProducts = [
     'reviews': 14,
     'location': 'Denpasar',
     'payment': 'Transfer M-Banking',
-    'promo': 'Tanpa Promo',
+    'promo': 'Tidak Promo',
     'ratingTag': 'Rating 5.0',
     'imagePlaceholder': 'Kotak Perhiasan',
     'altImages': ['Tutup Terbuka', 'Engsel Kuningan'],
@@ -340,3 +340,11 @@ final List<Map<String, dynamic>> mockProducts = [
     'isSaved': false,
   },
 ];
+
+List<Map<String, dynamic>> getLargeMockProducts({int count = 500}) {
+  return List.generate(count, (index) {
+    final base = mockProducts[index % mockProducts.length];
+    return Map<String, dynamic>.from(base)
+      ..['title'] = '${base['title']} #${index + 1}';
+  });
+}

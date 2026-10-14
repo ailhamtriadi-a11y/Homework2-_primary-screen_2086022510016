@@ -25,19 +25,23 @@ class NewsBannerWidget extends StatelessWidget {
         padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
                 Icon(Icons.newspaper, color: theme.colorScheme.onSecondaryContainer, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  'News & Order Updates',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onSecondaryContainer,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    'News & Order Updates',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.onSecondaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 if (activeFilter != 'All')
                   Chip(
                     labelStyle: theme.textTheme.labelSmall,
@@ -46,14 +50,27 @@ class NewsBannerWidget extends StatelessWidget {
                   ),
               ],
             ),
-            const Divider(),
-            ...updates.map(
-              (update) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2.0),
-                child: Text(
-                  update,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSecondaryContainer,
+            const Divider(height: 16),
+            // Membatasi tinggi kotak berita & memberi scrollbar khusus berita
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 120),
+              child: Scrollbar(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: updates
+                        .map(
+                          (update) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 3.0),
+                            child: Text(
+                              update,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSecondaryContainer,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ),
               ),

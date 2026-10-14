@@ -58,6 +58,8 @@ class ProductCardWidget extends StatelessWidget {
                       child: Text(
                         imagePlaceholder,
                         textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -69,15 +71,18 @@ class ProductCardWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Dominant Element: Title with Title Medium Hierarchy
                         Text(
                           title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           'By: $artist',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -85,6 +90,8 @@ class ProductCardWidget extends StatelessWidget {
                         if (location != null)
                           Text(
                             '📍 $location',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -95,12 +102,15 @@ class ProductCardWidget extends StatelessWidget {
                             const Icon(Icons.star, color: Colors.amber, size: 16),
                             Text(' $rating', style: theme.textTheme.bodyMedium),
                             const Spacer(),
-                            // Dominant Element: Price tag with Primary color role
-                            Text(
-                              price,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
+                            Flexible(
+                              child: Text(
+                                price,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -111,8 +121,11 @@ class ProductCardWidget extends StatelessWidget {
                 ],
               ),
               const Divider(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              Wrap(
+                alignment: WrapAlignment.end,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 4,
                 children: [
                   TextButton(
                     onPressed: onCancel,
@@ -127,7 +140,6 @@ class ProductCardWidget extends StatelessWidget {
                     selectedIcon: Icon(Icons.favorite, color: theme.colorScheme.primary),
                     onPressed: onSave,
                   ),
-                  const SizedBox(width: 8),
                   Badge(
                     label: Text('${buyCount}x'),
                     isLabelVisible: buyCount > 0,

@@ -23,8 +23,8 @@ class FilterPanelWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final subOptions = <String, List<String>>{
       'Location': ['All', 'Makassar', 'Jakarta', 'Bandung', 'Yogyakarta', 'Bali', 'Solo'],
-      'Transaction Methods': ['All', 'Transfer M-Banking', 'Tunai'],
-      'Promo': ['All', 'Ada Promo', 'Tanpa Promo'],
+      'Transaction Methods': ['All', 'M-Banking', 'Tunai'],
+      'Promo': ['All', 'Ada Promo', 'Tidak Promo'],
       'Rating': ['All', 'Rating 5.0', 'Rating 4.0+', 'Rating 3.0+', 'Rating 2.0+'],
     };
     final categories = subOptions.keys.toList();
@@ -37,18 +37,20 @@ class FilterPanelWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            // Tombol Action Menggunakan Wrap Agar Tidak Overflow di 320dp
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 FilledButton.icon(
                   onPressed: onApplyFilter,
-                  icon: const Icon(Icons.check, size: 18),
+                  icon: const Icon(Icons.check, size: 16),
                   label: const Text('Apply Filter'),
                 ),
-                const SizedBox(width: 8),
                 OutlinedButton(
                   onPressed: onClearFilter,
                   child: const Text('Clear'),
@@ -64,12 +66,16 @@ class FilterPanelWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
+            // Wrap menjaga chip turun ke bawah dengan aman jika layar 320dp
             Wrap(
-              spacing: 8,
-              runSpacing: 4,
+              spacing: 6,
+              runSpacing: 6,
               children: categories.map((cat) {
                 return ChoiceChip(
-                  label: Text(cat),
+                  label: Text(
+                    cat,
+                    style: theme.textTheme.bodySmall,
+                  ),
                   selected: selectedCategory == cat,
                   onSelected: (_) => onCategorySelected(cat),
                 );
@@ -86,11 +92,14 @@ class FilterPanelWidget extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Wrap(
-                spacing: 8,
-                runSpacing: 4,
+                spacing: 6,
+                runSpacing: 6,
                 children: subOptions[selectedCategory]!.map((sub) {
                   return FilterChip(
-                    label: Text(sub),
+                    label: Text(
+                      sub,
+                      style: theme.textTheme.bodySmall,
+                    ),
                     selected: selectedSubFilter == sub,
                     onSelected: (_) => onSubFilterSelected(sub),
                   );
