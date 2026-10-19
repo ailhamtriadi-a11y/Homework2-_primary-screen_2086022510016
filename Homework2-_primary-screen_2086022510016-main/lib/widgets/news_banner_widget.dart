@@ -29,11 +29,11 @@ class NewsBannerWidget extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.newspaper, color: theme.colorScheme.onSecondaryContainer, size: 20),
+                Icon(Icons.history_edu, color: theme.colorScheme.onSecondaryContainer, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'News & Order Updates',
+                    'Reading Logs & Activity',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -51,7 +51,6 @@ class NewsBannerWidget extends StatelessWidget {
               ],
             ),
             const Divider(height: 16),
-            // Membatasi tinggi kotak berita & memberi scrollbar khusus berita
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 120),
               child: Scrollbar(

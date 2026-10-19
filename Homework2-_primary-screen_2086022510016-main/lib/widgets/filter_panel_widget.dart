@@ -21,91 +21,60 @@ class FilterPanelWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final subOptions = <String, List<String>>{
-      'Location': ['All', 'Makassar', 'Jakarta', 'Bandung', 'Yogyakarta', 'Bali', 'Solo'],
-      'Transaction Methods': ['All', 'M-Banking', 'Tunai'],
-      'Promo': ['All', 'Ada Promo', 'Tidak Promo'],
-      'Rating': ['All', 'Rating 5.0', 'Rating 4.0+', 'Rating 3.0+', 'Rating 2.0+'],
-    };
-    final categories = subOptions.keys.toList();
+    final List<String> categories = ['All', 'Status', 'Rating'];
+    List<String> subFilters = ['All'];
+
+    if (selectedCategory == 'Status') {
+      subFilters = ['All', 'Reading', 'Completed', 'Plan to Read', 'Dropped'];
+    } else if (selectedCategory == 'Rating') {
+      subFilters = ['All', '5.0 Stars', '4.9 Stars', '4.8+ Stars', '4.7 Stars', '4.6 Stars', '4.5+ Stars', '4.4 Stars', '4.3 Stars', '4.2 Stars',
+      '4.1 Stars', '4.0+ Stars', '3.5+ Stars', '3.0+ Stars', '2.5+ Stars', '2.0+ Stars', '1.5+ Stars', '1.0+ Stars'];
+    }
 
     return Card(
-      color: theme.colorScheme.surfaceContainerLow,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: theme.colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      color: theme.colorScheme.surfaceContainerLow,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tombol Action Menggunakan Wrap Agar Tidak Overflow di 320dp
+            Text('Category', style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: [
-                FilledButton.icon(
-                  onPressed: onApplyFilter,
-                  icon: const Icon(Icons.check, size: 16),
-                  label: const Text('Apply Filter'),
-                ),
-                OutlinedButton(
-                  onPressed: onClearFilter,
-                  child: const Text('Clear'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '1. Select Category:',
-              style: theme.textTheme.labelLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Wrap menjaga chip turun ke bawah dengan aman jika layar 320dp
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
               children: categories.map((cat) {
                 return ChoiceChip(
-                  label: Text(
-                    cat,
-                    style: theme.textTheme.bodySmall,
-                  ),
+                  label: Text(cat),
                   selected: selectedCategory == cat,
                   onSelected: (_) => onCategorySelected(cat),
                 );
               }).toList(),
             ),
-            if (selectedCategory != 'All' && subOptions.containsKey(selectedCategory)) ...[
-              const SizedBox(height: 12),
-              Text(
-                '2. Select $selectedCategory:',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: subOptions[selectedCategory]!.map((sub) {
-                  return FilterChip(
-                    label: Text(
-                      sub,
-                      style: theme.textTheme.bodySmall,
-                    ),
-                    selected: selectedSubFilter == sub,
-                    onSelected: (_) => onSubFilterSelected(sub),
-                  );
-                }).toList(),
-              ),
-            ],
+            const SizedBox(height: 12),
+            Text('Filter Value', style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: subFilters.map((sub) {
+                return FilterChip(
+                  label: Text(sub),
+                  selected: selectedSubFilter == sub,
+                  onSelected: (_) => onSubFilterSelected(sub),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(onPressed: onClearFilter, child: const Text('Reset')),
+                const SizedBox(width: 8),
+                FilledButton(onPressed: onApplyFilter, child: const Text('Apply')),
+              ],
+            ),
           ],
         ),
       ),

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../widgets/search_bar_widget.dart';
-import '../widgets/filter_panel_widget.dart';
-import '../widgets/product_card_widget.dart';
-import '../widgets/news_banner_widget.dart';
-import '../data/mock_product.dart';
+import '../widgets/control_panel_widget.dart';
+import '../widgets/novel_card_widget.dart';
+import '../widgets/empty_state_widget.dart';
+import '../data/mock_novel_data.dart';
+import 'novel_detail_screen.dart';
+import 'add_edit_log_screen.dart';
 
 class PrimaryScreen extends StatefulWidget {
   const PrimaryScreen({super.key});
@@ -13,426 +14,170 @@ class PrimaryScreen extends StatefulWidget {
 }
 
 class _PrimaryScreenState extends State<PrimaryScreen> {
-  late List<Map<String, dynamic>> _allProducts;
-
-  String _searchQuery = '';
-  String _selectedCategory = 'All';
-  String _tempSubFilter = 'All';
-  String _activeFilter = 'All';
+  List<Map<String, dynamic>> _allLogs = [];
+  bool _isLoading = true;
+  String _searchQuery = '', _selectedCat = 'All', _subFilter = 'All', _activeFilter = 'All';
   bool _isFilterVisible = false;
-
-  final List<String> _newsUpdates = [
-    '📦 Status Paket: [Patung Keramik Custom] dalam perjalanan ke Makassar',
-  ];
+  final List<String> _news = ['📖 System: Novel Vault Tracker siap digunakan.'];
 
   @override
   void initState() {
     super.initState();
-    _allProducts = getLargeMockProducts(count: 500);
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    setState(() {
+      _allLogs = getLargeMockNovelLogs(count: 500);
+      _isLoading = false;
+    });
   }
 
   void _resetFilters() {
     setState(() {
-      _selectedCategory = 'All';
-      _tempSubFilter = 'All';
-      _activeFilter = 'All';
+      _selectedCat = _subFilter = _activeFilter = 'All';
       _searchQuery = '';
     });
   }
 
-void _showProductDetailDialog(Map<String, dynamic> product) {
-    final theme = Theme.of(context);
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Header: Judul & Tombol Silang (X) di Pojok Kanan Atas
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product['title'] as String,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+  Future<void> _addLog() async {
+    final res = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(builder: (_) => const AddEditLogScreen()),
+    );
+    if (res != null) {
+      setState(() {
+        _allLogs.insert(0, res);
+        _news.insert(0, '➕ Tambah: [${res['titleEnglish']}]');
+      });
+    }
+  }
 
-                  // Placeholder Gambar (Tinggi disesuaikan jadi 100 agar hemat ruang)
-                  Container(
-                    height: 100,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '🖼️ ${product['imagePlaceholder']}',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Foto Alternatif
-                  Text('Foto Alternatif Karya:', style: theme.textTheme.labelMedium),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: (product['altImages'] as List<String>).map((alt) {
-                      return Expanded(
-                        child: Card(
-                          elevation: 0,
-                          color: theme.colorScheme.surfaceContainerHigh,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 2.0),
-                            child: Text(
-                              alt,
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.labelSmall,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Informasi Artis
-                  ListTile(
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.palette),
-                    title: Text('Artis: ${product['artist']}'),
-                    subtitle: Text('WA: ${product['contact']} • Lokasi: ${product['location'] ?? "N/A"}'),
-                  ),
-
-                  // Rating & Varian
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 16),
-                      Text(' ${product['ratingValue']} (${product['reviews']} ulasan)', style: theme.textTheme.bodyMedium),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text('Varian: ${(product['colors'] as List<String>).join(', ')}', style: theme.textTheme.bodySmall),
-                  const SizedBox(height: 8),
-
-                  // Harga
-                  Text(
-                    'Harga: ${product['priceTag']}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Tombol Tutup Utama
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.tonal(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Tutup'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+  Widget _buildList(List<Map<String, dynamic>> list) {
+    if (list.isEmpty) return EmptyStateWidget(onReset: _resetFilters);
+    return ListView.builder(
+      key: const PageStorageKey('novel_list'),
+      padding: const EdgeInsets.only(bottom: 24),
+      itemCount: list.length,
+      itemBuilder: (context, i) {
+        final item = list[i];
+        return NovelCardWidget(
+          titleEnglish: item['titleEnglish'] ?? 'Untitled',
+          titleOriginal: item['titleOriginal'] ?? '',
+          author: item['author'] ?? 'Unknown',
+          status: item['status'] ?? 'Reading',
+          currentChapter: (item['currentChapter'] as num?)?.toInt() ?? 1,
+          rating: (item['ratingValue'] as num?)?.toDouble() ?? 0.0,
+          imagePlaceholder: item['imagePlaceholder'] ?? 'NVL',
+          imageUrl: item['imageUrl'] ?? '',
+          isSaved: item['isSaved'] ?? false,
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => NovelDetailScreen(novel: item))),
+          onEdit: () async {
+            final edit = await Navigator.push<Map<String, dynamic>>(context, MaterialPageRoute(builder: (_) => AddEditLogScreen(novelToEdit: item)));
+            if (edit != null) {
+              setState(() {
+                final idx = _allLogs.indexWhere((e) => e['id'] == item['id']);
+                if (idx != -1) {
+                  _allLogs[idx] = edit;
+                  _news.insert(0, '✏️ Edit: [${edit['titleEnglish']}]');
+                }
+              });
+            }
+          },
+          onSave: () => setState(() {
+            item['isSaved'] = !(item['isSaved'] as bool? ?? false);
+            _news.insert(0, item['isSaved'] == true ? '🔖 Bookmark: [${item['titleEnglish']}]' : '🗑️ Unbookmark');
+          }),
+          onDelete: () => setState(() {
+            _allLogs.removeWhere((e) => e['id'] == item['id']);
+            _news.insert(0, '❌ Hapus: [${item['titleEnglish']}]');
+          }),
         );
       },
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 64,
-              color: theme.colorScheme.secondary,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Karya seni tidak ditemukan',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Coba ubah kata kunci pencarian atau bersihkan filter.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: _resetFilters,
-              icon: const Icon(Icons.refresh, size: 16),
-              label: const Text('Reset Filter'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControlPanel() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SearchBarWidget(
-          searchQuery: _searchQuery,
-          onSearchChanged: (query) {
-            setState(() => _searchQuery = query);
-          },
-          isFilterVisible: _isFilterVisible,
-          onStarPressed: () {
-            setState(() {
-              _isFilterVisible = !_isFilterVisible;
-            });
-          },
-        ),
-        if (_isFilterVisible) ...[
-          const SizedBox(height: 12),
-          FilterPanelWidget(
-            selectedCategory: _selectedCategory,
-            selectedSubFilter: _tempSubFilter,
-            onCategorySelected: (cat) {
-              setState(() {
-                _selectedCategory = cat;
-                _tempSubFilter = 'All';
-              });
-            },
-            onSubFilterSelected: (sub) {
-              setState(() => _tempSubFilter = sub);
-            },
-            onApplyFilter: () {
-              setState(() {
-                _activeFilter = _tempSubFilter;
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Filter "$_activeFilter" diterapkan!')),
-              );
-            },
-            onClearFilter: () {
-              _resetFilters();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Filter dibersihkan!')),
-              );
-            },
-          ),
-        ],
-        const SizedBox(height: 12),
-        NewsBannerWidget(
-          title: 'Art Updates',
-          subtitle: 'Berita & status terbaru karya favoritmu',
-          updates: _newsUpdates,
-          activeFilter: _activeFilter,
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final filteredProducts = _allProducts.where((product) {
-      final matchesSearch = (product['title'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          (product['artist'] as String).toLowerCase().contains(_searchQuery.toLowerCase());
+    if (_isLoading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
-      if (!matchesSearch) return false;
+    final filtered = _allLogs.where((n) {
+      final title = (n['titleEnglish'] ?? '').toString().toLowerCase();
+      final orig = (n['titleOriginal'] ?? '').toString();
+      final author = (n['author'] ?? '').toString().toLowerCase();
+      final q = _searchQuery.toLowerCase();
+      if (!title.contains(q) && !orig.contains(q) && !author.contains(q)) return false;
       if (_activeFilter == 'All') return true;
-
-      final loc = product['location'] as String?;
-      final pay = product['payment'] as String?;
-      final promo = product['promo'] as String?;
-      final rTag = product['ratingTag'] as String?;
-
-      return loc == _activeFilter || pay == _activeFilter || promo == _activeFilter || rTag == _activeFilter;
+      final rating = (n['ratingValue'] as num?)?.toDouble() ?? 0.0;
+      if (_activeFilter.contains('Stars')) {
+        final val = double.tryParse(_activeFilter.split(' ')[0]) ?? double.tryParse(_activeFilter.split('+')[0]) ?? 0.0;
+        return _activeFilter.contains('+') ? rating >= val : rating == val;
+      }
+      return n['status'] == _activeFilter;
     }).toList();
+
+    final controlPanel = ControlPanelWidget(
+      searchQuery: _searchQuery,
+      onSearchChanged: (q) => setState(() => _searchQuery = q),
+      isFilterVisible: _isFilterVisible,
+      onToggleFilter: () => setState(() => _isFilterVisible = !_isFilterVisible),
+      selectedCategory: _selectedCat,
+      selectedSubFilter: _subFilter,
+      onCategorySelected: (c) => setState(() {
+        _selectedCat = c;
+        _subFilter = 'All';
+      }),
+      onSubFilterSelected: (s) => setState(() => _subFilter = s),
+      onApplyFilter: () => setState(() => _activeFilter = _subFilter),
+      onClearFilter: _resetFilters,
+      newsUpdates: _news,
+      activeFilter: _activeFilter,
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Art Marketplace'),
+        title: const Text('Novel Vault Tracker'),
         centerTitle: true,
+        actions: [IconButton(icon: const Icon(Icons.add), tooltip: 'Tambah Log Novel', onPressed: _addLog)],
       ),
+      floatingActionButton: MediaQuery.of(context).size.width >= 600
+          ? null
+          : FloatingActionButton.extended(onPressed: _addLog, icon: const Icon(Icons.add), label: const Text('Tambah Log')),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Layout Tablet (>= 600dp)
-            if (constraints.maxWidth >= 600) {
+            final isTablet = constraints.maxWidth >= 600;
+            if (isTablet) {
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: 340,
-                      child: SingleChildScrollView(
-                        child: _buildControlPanel(),
-                      ),
+                      width: 280,
+                      child: SingleChildScrollView(child: controlPanel),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: filteredProducts.isEmpty
-                          ? _buildEmptyState(theme)
-                          : ListView.builder(
-                              itemCount: filteredProducts.length + 1,
-                              itemBuilder: (context, index) {
-                                if (index == 0) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 12.0),
-                                    child: Text(
-                                      'Featured Art Works (${filteredProducts.length})',
-                                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                    ),
-                                  );
-                                }
-                                final item = filteredProducts[index - 1];
-                                return ProductCardWidget(
-                                  title: item['title'] as String,
-                                  artist: item['artist'] as String,
-                                  price: item['priceTag'] as String,
-                                  rating: (item['ratingValue'] as num).toDouble(),
-                                  location: item['location'] as String?,
-                                  imagePlaceholder: item['imagePlaceholder'] as String,
-                                  buyCount: item['buyCount'] as int,
-                                  isSaved: item['isSaved'] as bool,
-                                  onTap: () => _showProductDetailDialog(item),
-                                  onBuy: () {
-                                    setState(() {
-                                      item['buyCount'] = (item['buyCount'] as int) + 1;
-                                      _newsUpdates.insert(0, '🛒 Pembelian karya [${item['title']}] berhasil!');
-                                    });
-                                  },
-                                  onSave: () {
-                                    setState(() {
-                                      item['isSaved'] = !(item['isSaved'] as bool);
-                                      if (item['isSaved'] as bool) {
-                                        _newsUpdates.insert(0, '❤️ Kamu menyimpan karya: [${item['title']}]');
-                                      } else {
-                                        _newsUpdates.insert(0, '🗑️ Kamu menghapus simpanan karya: [${item['title']}]');
-                                      }
-                                    });
-                                  },
-                                  onCancel: () {
-                                    setState(() {
-                                      if (item['isSaved'] == true) item['isSaved'] = false;
-                                      _newsUpdates.insert(0, '❌ Membatalkan pesanan/simpanan [${item['title']}]');
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Transaksi "${item['title']}" dibatalkan.')),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Tracked Novels (${filtered.length})', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          Expanded(child: _buildList(filtered)),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               );
             }
-
-            // Layout Mobile (< 600dp): Seluruh Layar Bebas Di-scroll
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildControlPanel(),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Featured Art Works (${filteredProducts.length})',
-                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  if (filteredProducts.isEmpty)
-                    _buildEmptyState(theme)
-                  else
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: filteredProducts.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredProducts[index];
-                        return ProductCardWidget(
-                          title: item['title'] as String,
-                          artist: item['artist'] as String,
-                          price: item['priceTag'] as String,
-                          rating: (item['ratingValue'] as num).toDouble(),
-                          location: item['location'] as String?,
-                          imagePlaceholder: item['imagePlaceholder'] as String,
-                          buyCount: item['buyCount'] as int,
-                          isSaved: item['isSaved'] as bool,
-                          onTap: () => _showProductDetailDialog(item),
-                          onBuy: () {
-                            setState(() {
-                              item['buyCount'] = (item['buyCount'] as int) + 1;
-                              _newsUpdates.insert(0, '🛒 Pembelian karya [${item['title']}] berhasil!');
-                            });
-                          },
-                          onSave: () {
-                            setState(() {
-                              item['isSaved'] = !(item['isSaved'] as bool);
-                              if (item['isSaved'] as bool) {
-                                _newsUpdates.insert(0, '❤️ Kamu menyimpan karya: [${item['title']}]');
-                              } else {
-                                _newsUpdates.insert(0, '🗑️ Kamu menghapus simpanan karya: [${item['title']}]');
-                              }
-                            });
-                          },
-                          onCancel: () {
-                            setState(() {
-                              if (item['isSaved'] == true) item['isSaved'] = false;
-                              _newsUpdates.insert(0, '❌ Membatalkan pesanan/simpanan [${item['title']}]');
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Transaksi "${item['title']}" dibatalkan.')),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                ],
-              ),
+            return Column(
+              children: [
+                Padding(padding: const EdgeInsets.all(12.0), child: controlPanel),
+                Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 12.0), child: _buildList(filtered))),
+              ],
             );
           },
         ),

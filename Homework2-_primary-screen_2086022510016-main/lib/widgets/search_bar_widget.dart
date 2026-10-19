@@ -19,7 +19,7 @@ class SearchBarWidget extends StatelessWidget {
     final theme = Theme.of(context);
     
     return SearchBar(
-      hintText: 'Search artwork or artist...',
+      hintText: 'Cari judul (Inggris/Asli) atau penulis...',
       leading: IconButton(
         icon: Icon(
           Icons.filter_list,
